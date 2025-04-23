@@ -28,6 +28,7 @@ def grupo_de_dados_2():
     grupoTest = mat['grupoTest']
     testRots = mat['testRots']
 
+    # Normalização
     resultado = testa_valores_de_k(grupoTrain, trainRots, grupoTest, testRots)
     melhor_k, melhor_acuracia = resultado["melhor_k"], resultado["melhor_acuracia"]
 
@@ -75,6 +76,7 @@ def grupo_de_dados_2():
     #     # Append the normalized row to the list of normalized test data
     #     test_data_normalized.append(normalized_row)
 
+    # Testar valores de k para obter a melhor correspondência
     resultado = testa_valores_de_k(grupoTrain, trainRots, grupoTest, testRots)
     melhor_k, melhor_acuracia = resultado["melhor_k"], resultado["melhor_acuracia"]
     # print("--------")
