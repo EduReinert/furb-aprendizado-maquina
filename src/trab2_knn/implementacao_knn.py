@@ -34,7 +34,7 @@ def meuKnn(dadosTrain, rotuloTrain, dadosTeste, k):
 
 def dist(dadoTeste, dadoTrain):
     soma = 0
-    for i in range(len(dadoTeste)):
+    for i in range(len(dadoTrain)):
         soma += (dadoTeste[i] - dadoTrain[i]) ** 2
 
     return math.sqrt(soma)
