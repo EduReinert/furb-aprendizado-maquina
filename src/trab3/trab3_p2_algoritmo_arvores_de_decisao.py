@@ -7,6 +7,7 @@ import pickle
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, classification_report
 from yellowbrick.classifier import ConfusionMatrix
+from sklearn.ensemble import RandomForestClassifier
     
 def algoritmo_arvore_decisao_menor():
     """# 1 - Importação dos dados Pré-Processados
@@ -137,10 +138,101 @@ def algoritmo_arvore_decisao_maior():
     plt.title("Árvore de Decisão - Credit Data", fontsize=20)
     plt.show()
 
-def main():
-    algoritmo_arvore_decisao_menor()
-    algoritmo_arvore_decisao_maior()
+def algoritmo_random_forest():
+    # abrir o arquivo
+    with open('credit.pkl', 'rb') as f:
+        X_credit_treinamento, y_credit_treinamento, X_credit_teste, y_credit_teste = pickle.load(f)
+
+    """
+    b) Para gerar a classificação você deve adicionar alguns parâmetros:
+*   n_estimators=10  --> número de árvores que você irá criar
+*   criterion='entropy'
+*   random_state = 0
+
+    """
+    random_forest = RandomForestClassifier(n_estimators=10, criterion='entropy', random_state=0)
+    random_forest.fit(X_credit_treinamento, y_credit_treinamento)
+
+    """
+    c) Faça a previsão com os dados de teste. Visualize os dados e verifique se as previsões estão de acordo com os dados de teste (respostas reais).
+    """
+    previsoes = random_forest.predict(X_credit_teste)
     
+    print("\nComparação entre previsões e valores reais (10 primeiras amostras):")
+    for i in range(10):
+        print(f"Amostra {i+1}: Previsto = {previsoes[i]}, Real = {y_credit_teste[i]}")
+
+    """
+    d) Agora faça o cálculo da acurácia para calcular a taxa de acerto entre os valores reais (y teste) e as previsões. 
+    O resultado foi melhor do que a árvore de decisão simples?
+    """
+    acuracia = accuracy_score(y_credit_teste, previsoes)
+    print(f"\nAcurácia do Random Forest: {acuracia:.2%}")
+    
+    # Comparação com a árvore de decisão simples (do exercício anterior)
+    arvore_credit = DecisionTreeClassifier(random_state=0)
+    arvore_credit.fit(X_credit_treinamento, y_credit_treinamento)
+    acuracia_arvore = accuracy_score(y_credit_teste, arvore_credit.predict(X_credit_teste))
+    print(f"Acurácia da Árvore de Decisão Simples: {acuracia_arvore:.2%}")
+    
+    if acuracia > acuracia_arvore:
+        print("O Random Forest obteve melhor resultado que a árvore de decisão simples.")
+    elif acuracia < acuracia_arvore:
+        print("O Random Forest obteve resultado inferior à árvore de decisão simples.")
+    else:
+        print("O Random Forest obteve o mesmo resultado que a árvore de decisão simples.")
+
+    """
+    e) Se o resultado foi inferior, como você poderia resolver isso? Quais foram os resultados obtidos?
+
+    Possíveis melhorias
+    1. Aumentar o número de árvores (n_estimators)
+    2. Ajustar outros parâmetros como max_depth, min_samples_split, etc.
+    3. Utilizar cross-validation para encontrar melhores parâmetros
+    4. Verificar balanceamento das classes e possivelmente aplicar técnicas como oversampling
+    
+    f) Faça a análise da Matriz de Confusão.
+    """
+    print("\nMatriz de Confusão:")
+    cm = ConfusionMatrix(random_forest)
+    cm.fit(X_credit_treinamento, y_credit_treinamento)
+    cm.score(X_credit_teste, y_credit_teste)
+    plt.title("Matriz de Confusão - Random Forest")
+    plt.show()
+    
+    # Extraindo valores da matriz de confusão para análise
+    from sklearn.metrics import confusion_matrix
+    matriz = confusion_matrix(y_credit_teste, previsoes)
+    print("\nAnálise da Matriz de Confusão:")
+    print(f"Verdadeiros Positivos (TP): {matriz[1][1]}")
+    print(f"Falsos Positivos (FP): {matriz[0][1]}")
+    print(f"Verdadeiros Negativos (TN): {matriz[0][0]}")
+    print(f"Falsos Negativos (FN): {matriz[1][0]}")
+
+    """
+    g) Faça um print do parâmetro classification_report entre os dados de teste e as previsões. 
+    Explique qual é a relação entre precision e recall nos dados. Como você interpreta esses dados?
+    """
+    print("\nClassification Report:")
+    report = classification_report(y_credit_teste, previsoes)
+    print(report)
+    
+    """
+    Interpretação:
+    Precision (precisão): Proporção de previsões positivas que foram corretas.
+    Recall (revocação): Proporção de casos positivos reais que foram identificados.
+    F1-score: Média harmônica entre precision e recall, útil quando há desbalanceamento de classes.
+    No contexto de crédito:
+    - Alta precision para classe 0 (pagadores) significa que quando classificamos como pagador, temos alta confiança.
+    - Alto recall para classe 1 (não pagadores) significa que estamos capturando a maioria dos maus pagadores.
+    Geralmente há um trade-off entre precision e recall que deve ser balanceado conforme o risco que o banco está disposto a assumir.
+    
+    """
+
+def main():
+    #algoritmo_arvore_decisao_menor()
+    #algoritmo_arvore_decisao_maior()
+    algoritmo_random_forest()
 
 if __name__ == "__main__":
     main()
