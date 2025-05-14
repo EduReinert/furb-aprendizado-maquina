@@ -8,6 +8,14 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, classification_report
 from yellowbrick.classifier import ConfusionMatrix
 from sklearn.ensemble import RandomForestClassifier
+
+"""
+ALUNOS:
+
+Augusto Arraga
+Eduardo Reinert
+Vinicius Vanelli
+"""
     
 def algoritmo_arvore_decisao_menor():
     """# 1 - Importação dos dados Pré-Processados

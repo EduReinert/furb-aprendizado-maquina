@@ -7,6 +7,14 @@ from sklearn.preprocessing import LabelEncoder
 import pickle
 from sklearn.naive_bayes import GaussianNB
 
+"""
+ALUNOS:
+
+Augusto Arraga
+Eduardo Reinert
+Vinicius Vanelli
+"""
+
 def pre_processamento_dados(X_risco_credito, y_risco_credito):
     #Label Encoder
     label_encoder_historia = LabelEncoder()
