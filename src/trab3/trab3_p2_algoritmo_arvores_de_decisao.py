@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import pickle
 from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, classification_report
+from yellowbrick.classifier import ConfusionMatrix
     
 def algoritmo_arvore_decisao_menor():
     """# 1 - Importação dos dados Pré-Processados
@@ -72,7 +74,68 @@ def algoritmo_arvore_decisao_maior():
     print(f"y treinamento: {y_credit_treinamento.shape}")
     print(f"X teste: {X_credit_teste.shape}")
     print(f"y teste: {y_credit_teste.shape}")
+    
+    # b) Importar e treinar o DecisionTreeClassifier
+    arvore_credit = DecisionTreeClassifier(random_state=0)
+    arvore_credit.fit(X_credit_treinamento, y_credit_treinamento)
+    
+    # c) Fazer previsões com os dados de teste
+    previsoes = arvore_credit.predict(X_credit_teste)
+    
+    print("\nPrimeiras 10 previsões vs valores reais:")
+    for i in range(10):
+        print(f"Previsão: {previsoes[i]} | Real: {y_credit_teste[i]}")
+    
+    # d) Calcular a acurácia
+    acuracia = accuracy_score(y_credit_teste, previsoes)
+    print(f"\nAcurácia: {acuracia:.2%}")
+    
+    """
+    #e) Análise da matriz de confusão
+    
+    i. Quantos clientes foram classificados corretamente que pagam a dívida?
 
+    ii. Quantos clientes foram classificados incorretamente como não pagantes?
+
+    iii. Quantos clientes foram classificados corretamente que não pagam?
+
+    iv. Quantos clientes foram classificados incorretamente como pagantes?
+    """
+    cm = ConfusionMatrix(arvore_credit)
+    cm.fit(X_credit_treinamento, y_credit_treinamento)
+    cm.score(X_credit_teste, y_credit_teste)
+    plt.title("Matriz de Confusão - Yellowbrick")
+    plt.show()
+    
+    # f) Faça um print do parâmetro classification_report entre os dados de teste e as previsões. Explique qual é a relação entre precision e recall nos dados. Como você interpreta esses dados?
+    print("\nClassification Report:")
+    report = classification_report(y_credit_teste, previsoes)
+    print(report)
+    
+    
+    """ g) Gere uma visualização da sua árvore de decisão utilizando o pacote tree da biblioteca do sklearn.
+    OBS 1: Os atributos previsores são = ['income', 'age', 'loan']
+
+    OBS 2: Adicione cores, nomes para os atributos e para as classes. Você pode utilizar a função fig.savefig para salvar a árvore em uma imagem .png
+
+    """
+    plt.figure(figsize=(25, 15))
+    atributos = ['income', 'age', 'loan']  # Nomes dos atributos previsores
+    classes = ['pagador', 'não pagador']    # Nomes das classes
+    
+    # Plotando a árvore
+    plot_tree(arvore_credit,
+              feature_names=atributos,
+              class_names=classes,
+              filled=True,          # Preenchimento com cores
+              rounded=True,         # Bordas arredondadas
+              proportion=True,      # Mostra proporções nas classes
+              impurity=False,       # Não mostra impureza
+              fontsize=10,          # Tamanho da fonte
+              max_depth=3)          # Limitando a profundidade para melhor visualização
+    
+    plt.title("Árvore de Decisão - Credit Data", fontsize=20)
+    plt.show()
 
 def main():
     algoritmo_arvore_decisao_menor()
