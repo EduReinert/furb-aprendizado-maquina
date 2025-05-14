@@ -36,7 +36,7 @@ def naive_bayes(X_risco_credito, y_risco_credito):
     # Exemplo 1: História boa, dívida alta, garantia nenhuma, renda > 35
     exemplo_1 = [[0, 0, 1, 2]]  # Atributos de exemplo
     previsao_1 = naiveb_risco_credito.predict(exemplo_1)
-    print(f'Previsão, exemplo 1: {previsao_1[0]}')
+    print(f'\nPrevisão, exemplo 1: {previsao_1[0]}')
 
     # Exemplo 2: História ruim, dívida alta, garantia adequada, renda < 15
     exemplo_2 = [[2, 0, 0, 0]]  # Atributos de exemplo
@@ -52,12 +52,18 @@ def naive_bayes(X_risco_credito, y_risco_credito):
 
 def main():
     #Entrada do dataset e transformação
+    # a) DIVISÃO DA BASE DE DADOS
     dataset_risco_credito = pd.read_csv('dataset_risco_credito.csv')
     X_risco_credito = dataset_risco_credito.iloc[:, :-1].values  # Todas as colunas menos a última
     y_risco_credito = dataset_risco_credito.iloc[:, -1].values  # Apenas a última coluna
 
-    #Chamada das funções
+    #b) APLICAR LABEL ENCODER
     pre_processamento_dados(X_risco_credito, y_risco_credito)
+    print('Após Label Encoder:')
+    print(f'\nX_risco_credito', X_risco_credito)
+    print(f'\ny_risco_credito', y_risco_credito)
+    
+    #chamada Naive Bayes
     naive_bayes(X_risco_credito, y_risco_credito)
 
 if __name__ == "__main__":
