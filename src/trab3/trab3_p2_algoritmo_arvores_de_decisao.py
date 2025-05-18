@@ -238,8 +238,8 @@ def algoritmo_random_forest():
     """
 
 def main():
-    #algoritmo_arvore_decisao_menor()
-    #algoritmo_arvore_decisao_maior()
+    algoritmo_arvore_decisao_menor()
+    algoritmo_arvore_decisao_maior()
     algoritmo_random_forest()
 
 if __name__ == "__main__":

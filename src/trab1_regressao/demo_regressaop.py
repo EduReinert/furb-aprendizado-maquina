@@ -310,7 +310,7 @@ def gera_graficos(vetor_x, vetor_y, correlacao, regressao, cor_linha_regressao):
 
     for i in range(menor_x, maior_x):
         array_x.append(i)
-        array_y.append(regressao[0] + (regressao[1] * i))
+        array_y = estima_y(regressao, array_x)
 
     betas_titulo =  ", ".join([f"beta {i} = {regressao[i]:.4f}" for i in range(len(regressao))])
 
