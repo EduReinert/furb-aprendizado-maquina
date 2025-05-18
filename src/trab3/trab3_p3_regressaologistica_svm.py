@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import pickle
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+from yellowbrick.classifier import ConfusionMatrix
 
 """
 ALUNOS:
@@ -16,9 +18,7 @@ Vinicius Vanelli
 
 def regressao_logistica():
     #1. Utilize a base de dados construída no Trabalho 3 ‘risco_credito.pkl’, que possui 14 registros, para testar o algoritmo de Regressão Logística.
-    arquivo_encoded = 'risco_credito.pkl'
-
-    with open(arquivo_encoded, 'rb') as f:
+    with open('risco_credito.pkl', 'rb') as f:
         dados = pickle.load(f)
 
     X, y = dados
@@ -53,9 +53,46 @@ def regressao_logistica():
     previsao_02 = regressao_logistica.predict([[2, 0, 0, 0]])
     print(f'Esperado: alto \nObtido:', previsao_02)
 
+def regressao_logistica_maior():
+    # abrir o arquivo
+    with open('credit.pkl', 'rb') as f:
+        X_credit_treinamento, y_credit_treinamento, X_credit_teste, y_credit_teste = pickle.load(f)
+    
+    #7. Agora aplique a Regressão Logística na base de dados ‘credit.pkl’. De quanto foi a taxa de acerto?
+    regressao_logistica = LogisticRegression(random_state=1)
+    regressao_logistica = regressao_logistica.fit(X_credit_treinamento, y_credit_treinamento)
+    
+    #Previsões
+    previsoes = regressao_logistica.predict(X_credit_teste)
+    
+    #Taxa de acerto (acurácia)
+    taxa_acerto = accuracy_score(y_credit_teste, previsoes)
+    print(f'Taxa de acerto na base maior (credit.pkl): {taxa_acerto}')
+    
+    #Matriz de confusão
+    plt.figure(figsize=(6, 4))
+    cm = ConfusionMatrix(regressao_logistica)
+    cm.score(X_credit_teste, y_credit_teste)
+    plt.title('Matriz de Confusão')
+    plt.show()
+
+    # Classificação e recall
+    print("\nClassification Report:")
+    report = classification_report(y_credit_teste, previsoes)
+    print(report)
+    
+    """
+    8. O resultado com a base de dados ‘credit.pkl’ é melhor que os resultados do Naive Bayes e das Florestas Aleatórias? 
+    Descreva sua análise de resultados (observe que para isso você deverá visualizar os resultados da Matriz de Confusão, acurácia, precisão e recall).
+
+    """
+
 def main():
     # PARTE 3: Regressão Logística (risco_credito.pkl)
-    regressao_logistica('risco_credito.pkl')
+    regressao_logistica()
+    print('\n\n\n')
+    #Algoritmo de Regressão Logística para uma base de dados maior (Credit Data)
+    regressao_logistica_maior()
     
     
     
