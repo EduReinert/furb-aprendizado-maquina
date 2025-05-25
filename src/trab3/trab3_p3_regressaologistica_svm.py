@@ -6,7 +6,7 @@ import plotly.express as px
 import pickle
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
-from yellowbrick.classifier import ConfusionMatrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.svm import SVC
 
 """
@@ -70,8 +70,9 @@ def regressao_logistica_maior():
     
     #Matriz de confusão
     plt.figure(figsize=(6, 4))
-    cm = ConfusionMatrix(regressao_logistica)
-    cm.score(X_credit_teste, y_credit_teste)
+    cmatrix = confusion_matrix(y_credit_teste, previsoes)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cmatrix)
+    disp.plot()
     plt.title('Matriz de Confusão')
     plt.show()
 
