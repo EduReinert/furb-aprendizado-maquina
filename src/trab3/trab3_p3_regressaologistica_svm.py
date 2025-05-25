@@ -82,11 +82,13 @@ def regressao_logistica_maior():
     print(report)
     
     """
-    TODO
     8. O resultado com a base de dados ‘credit.pkl’ é melhor que os resultados do Naive Bayes e das Florestas Aleatórias? 
     Descreva sua análise de resultados (observe que para isso você deverá visualizar os resultados da Matriz de Confusão, acurácia, precisão e recall).
     
     RESPOSTA:
+    A Regressão Logística teve acurácia de 94,6%, menor que a Árvore de Decisão (98%) 
+    e Random Forest (96,8%). Ela foi boa para identificar pagadores, mas teve desempenho menor
+    para inadimplentes. No geral, os métodos de árvore foram melhores nesse conjunto de dados.
     
     
     """

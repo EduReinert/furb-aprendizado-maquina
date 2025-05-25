@@ -98,3 +98,15 @@ def svm_credit():
 
 if __name__ == "__main__":
     svm_credit()
+
+
+    """
+6. O resultado do SVM é melhor que os resultados do Naive Bayes, Florestas Aleatórias e Regressão Logística? 
+Descreva sua análise de resultados (observe que para isso você deverá visualizar os resultadosda Matriz de Confusão, acurácia, precisão e recall).
+
+RESPOSTA:
+O SVM, usando com kernel rbf e C alto, atingiu até 99% de acurácia, 
+superando todos os outros algoritmos. Ele foi eficiente para as duas classes, 
+mostrando o melhor desempenho geral entre os modelos testados.
+
+    """
