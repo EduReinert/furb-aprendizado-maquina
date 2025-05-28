@@ -1,13 +1,8 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
-import plotly.express as px
 import pickle
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.svm import SVC
+from yellowbrick.classifier import ConfusionMatrix
 
 """
 ALUNOS:
@@ -69,10 +64,9 @@ def regressao_logistica_maior():
     print(f'Taxa de acerto na base maior (credit.pkl): {taxa_acerto}')
     
     #Matriz de confusão
-    plt.figure(figsize=(6, 4))
-    cmatrix = confusion_matrix(y_credit_teste, previsoes)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cmatrix)
-    disp.plot()
+    cm = ConfusionMatrix(regressao_logistica)
+    cm.fit(X_credit_treinamento, y_credit_treinamento)
+    cm.score(X_credit_teste, y_credit_teste)
     plt.title('Matriz de Confusão')
     plt.show()
 
@@ -92,16 +86,6 @@ def regressao_logistica_maior():
     
     
     """
-
-def svm():
-    # abrir o arquivo
-    with open('credit.pkl', 'rb') as f:
-        X_credit_treinamento, y_credit_treinamento, X_credit_teste, y_credit_teste = pickle.load(f)
-        
-    #1. Aplique o algoritmo SVM na base de dados ‘credit.pkl’.
-    #2. Inicialmente treine o SVM com kernel linear, valor do parâmetro C = 1.0 e ‘random_state =1’
-    svm = SVC(kernel='linear', C=1.0, random_state=1)
-    svm.fit(X_credit_treinamento, y_credit_treinamento)
 
 def main():
     # PARTE 3: Regressão Logística (risco_credito.pkl)

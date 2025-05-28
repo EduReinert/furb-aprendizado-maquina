@@ -86,7 +86,6 @@ def svm_credit():
     
     # Matriz de confusão e relatório de classificação para o melhor modelo
     print("\nMatriz de Confusão (GridSearch):")
-    plt.figure(figsize=(6, 4))
     cmatrix = confusion_matrix(y_credit_teste, previsoes_grid)
     disp = ConfusionMatrixDisplay(confusion_matrix=cmatrix)
     disp.plot()
