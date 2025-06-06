@@ -5,7 +5,7 @@
 
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.initializers import RandomUniform
@@ -13,8 +13,11 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import BinaryAccuracy
 from tensorflow.keras.metrics import BinaryAccuracy
 from scikeras.wrappers import KerasClassifier
-from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from tensorflow.keras import backend as k
 
 # Carregar os dados
 dados = pd.read_csv('dados_breast.csv')
@@ -24,11 +27,6 @@ rotulos = pd.read_csv('rotulos_breast.csv')
 X_treinamento, X_teste, y_treinamento, y_teste = train_test_split(
     dados, rotulos, test_size=0.25, random_state=42
 )
-
-# Pra normalizar os dados:
-# scaler = StandardScaler()
-# X_treinamento = scaler.fit_transform(X_treinamento)
-# X_teste = scaler.transform(X_teste)
 
 def estrutura_da_rede_neural_artificial_e_teste():
     print("--- Estrutura da Rede Neural Artificial e Teste ---\n")
@@ -109,6 +107,8 @@ def estrutura_da_rede_neural_artificial_e_teste():
 
 def camadas_e_otimizacao_da_rna():
     print("--- Camadas e Otimização da RNA --- \n")
+  
+    k.clear_session()
 
     rede_neural = Sequential()
     
@@ -204,64 +204,116 @@ def camadas_e_otimizacao_da_rna():
     O loss aumentou provavelmente pq a função binary_crossentropy penaliza muito previsões erradas mas confiantes (ex.: prever 0.99 quando o correto é 0).
     """
 
-estrutura_da_rede_neural_artificial_e_teste()
-camadas_e_otimizacao_da_rna()
+def k_fold_cross_validation():
+    k.clear_session()
 
-# ## 13-14) K-Fold Cross Validation
-# # Carregando os dados completos novamente para o K-Fold
-# X = dados.values
-# y = rotulos.values.ravel()  # Convertendo para array 1D
+    rede_neural = Sequential([
+        tf.keras.layers.InputLayer(shape=(30,)),
+        tf.keras.layers.Dense(units=16, activation='relu', kernel_initializer='random_uniform'),
+        tf.keras.layers.Dense(units=16, activation='relu', kernel_initializer='random_uniform'),
+        tf.keras.layers.Dense(units=1, activation = 'sigmoid')])
 
-# def criar_rede():
-#     k.clear_session()  # Limpa a sessão do TensorFlow/Keras
-#     rede_neural = Sequential([
-#         Dense(units=16, activation='relu', kernel_initializer='random_uniform', input_shape=(30,)),
-#         Dense(units=16, activation='relu', kernel_initializer='random_uniform'),
-#         Dense(units=1, activation='sigmoid')
-#     ])
-#     otimizador = Adam(learning_rate=0.001, clipvalue=0.5)
-#     rede_neural.compile(
-#         optimizer=otimizador,
-#         loss='binary_crossentropy',
-#         metrics=['binary_accuracy']
-#     )
-#     return rede_neural
+    otimizador = tf.keras.optimizers.Adam(learning_rate = 0.001, clipvalue = 0.5)
 
-# # Configurando o KerasClassifier para usar com cross_val_score
-# rede_neural = KerasClassifier(
-#     model=criar_rede,
-#     epochs=100,
-#     batch_size=10,
-#     verbose=0
-# )
+    rede_neural.compile(optimizer = otimizador, loss = 'binary_crossentropy', metrics = ['binary_accuracy'])
 
-# # Executando K-Fold Cross Validation com 10 folds
-# resultados = cross_val_score(
-#     estimator=rede_neural,
-#     X=X,
-#     y=y,
-#     cv=10,  # 10 folds
-#     scoring='accuracy'
-# )
+    # 13) Explique como esta rede foi configurada e como é possível chegar no resultado dela. O que é necessário fazer?
+    # A rede foi configurada do mesmo jeito que antes, mas agora a gente usa o KerasClassifier pra poder chamar a função cross_val_score (do sklearn) no objeto da classe Sequential (do tensorflow).
+    # O cross_val_score:
+    #   divide os dados em 10 partes (folds)
+    #   faz 10 rodadas:
+    #       Treina a rede com 9 partes.
+    #       Testa com a 10ª parte.
+    #   faz a média das precisões das rodadas
+    
+    rede_neural = KerasClassifier(model = rede_neural, epochs = 100, batch_size = 10)
 
-# # Resultados
-# print("\nAcurácias em cada fold:", resultados)
-# print("Média das acurácias:", resultados.mean())
-# print("Desvio padrão das acurácias:", resultados.std())
+    X = dados.values
+    y = rotulos.values.ravel()
+    resultados = cross_val_score(estimator = rede_neural, X = X, y = y, cv = 10, scoring = 'accuracy')
 
-# """
-# Resposta 13:
-# O K-Fold Cross Validation foi configurado da seguinte forma:
-# 1. A função criar_rede define a arquitetura da RNA (igual à usada anteriormente)
-# 2. Usamos KerasClassifier para adaptar o modelo Keras à interface do scikit-learn
-# 3. cross_val_score divide os dados em 10 folds (cv=10), treina em 9 e testa em 1, repetindo para todos os folds
-# 4. A métrica usada é acurácia ('accuracy')
+    print("\nAcurácias em cada fold:", resultados)
+    print("Média das acurácias:", resultados.mean())
+    print("Desvio padrão das acurácias:", resultados.std())
 
-# Isso fornece uma estimativa mais robusta do desempenho do modelo, pois usa todas as amostras para treino e teste em diferentes combinações.
+    # 14) Calcule também o Desvio Padrão dos resultados para avaliar o modelo. O que é possível concluir com esse resultado?
+    # O desvio padrão mede o quanto as acurácias dos folds variaram entre si. Um desvio padrão de 7,6% não é muito baixo, então o desempenho da rede variou bastante entre os folds.
+    # Isso pode ser um sinal de overfitting.
 
-# Resposta 14:
-# O desvio padrão dos resultados mostra a variabilidade no desempenho entre os diferentes folds:
-# - Um desvio padrão baixo indica que o modelo tem desempenho consistente em diferentes subconjuntos dos dados
-# - Um desvio padrão alto sugere que o modelo pode ser sensível à seleção específica de dados de treino/teste
-# Combinado com a média de acurácia, podemos ter mais confiança na generalização do modelo se ambos os valores forem bons.
-# """
+def overfitting_e_dropout():
+    k.clear_session()
+
+    rede_neural = Sequential([
+        tf.keras.layers.InputLayer(shape=(30,)),
+        tf.keras.layers.Dense(units=16, activation='relu', kernel_initializer='random_uniform'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(units=16, activation='relu', kernel_initializer='random_uniform'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(units=1, activation = 'sigmoid')])
+
+    otimizador = tf.keras.optimizers.Adam(learning_rate = 0.001, clipvalue = 0.5)
+
+    rede_neural.compile(optimizer = otimizador, loss = 'binary_crossentropy', metrics = ['binary_accuracy'])
+
+    rede_neural = KerasClassifier(model = rede_neural, epochs = 100, batch_size = 10)
+
+    X = dados.values
+    y = rotulos.values.ravel()
+    resultados = cross_val_score(estimator = rede_neural, X = X, y = y, cv = 10, scoring = 'accuracy')
+
+    # 14) Aplique o dropout de 20% na primeira e segunda camada oculta. O que acontece com os resultados? E o Desvio Padrão?
+    # A acurácia dos folds aumentou um pouco, e o desvio padrão entre elas diminuiu.
+    print("\nAcurácias em cada fold:", resultados)
+    print("Média das acurácias:", resultados.mean())
+    print("Desvio padrão das acurácias:", resultados.std())
+
+def tuning_dos_hiperparametros():
+    def criar_rede(optimizer, loss, kernel_initializer, activation, neurons):
+        k.clear_session()
+        rede_neural = Sequential([
+            tf.keras.layers.InputLayer(shape=(30,)),
+            tf.keras.layers.Dense(units=neurons, activation=activation, kernel_initializer=kernel_initializer),
+            tf.keras.layers.Dropout(rate = 0.2),
+            tf.keras.layers.Dense(units=neurons, activation=activation, kernel_initializer=kernel_initializer),
+            tf.keras.layers.Dropout(rate = 0.2),
+            tf.keras.layers.Dense(units=1, activation = 'sigmoid')])
+        rede_neural.compile(optimizer = optimizer, loss = loss, metrics = ['binary_accuracy'])
+        return rede_neural
+
+    rede_neural = KerasClassifier(model = criar_rede)
+
+    # 15) Descreva como a RNA foi configurada para fazer o processo de tuning.
+    parametros = {
+        'batch_size': [10, 30],
+        'epochs': [50, 100],
+        'model__optimizer': ['adam', 'sgd'],
+        'model__loss': ['binary_crossentropy', 'hinge'],
+        'model__kernel_initializer': ['random_uniform', 'normal'],
+        'model__activation': ['relu', 'tanh'],
+        'model__neurons': [16, 8]
+    }
+
+    grid_search = GridSearchCV(estimator = rede_neural, param_grid = parametros, scoring = 'accuracy', cv = 5)
+
+    X = dados.values
+    y = rotulos.values.ravel()
+    grid_search = grid_search.fit(X, y)
+    melhores_parametros = grid_search.best_params_
+    melhor_precisao = grid_search.best_score_
+
+    print(grid_search)
+    print(melhores_parametros)
+    print(melhor_precisao)
+
+    # 16) É possível melhorar ainda mais a acurácia da RNA? Como?
+    # Sim, fazendo a Z-score normalization, pra evitar que features com escalas maiores dominem as outras.
+    scaler = StandardScaler()
+    X_treinamento = scaler.fit_transform(X_treinamento)
+    X_teste = scaler.transform(X_teste)
+
+
+# estrutura_da_rede_neural_artificial_e_teste()
+# camadas_e_otimizacao_da_rna()
+# k_fold_cross_validation()
+# overfitting_e_dropout()
+tuning_dos_hiperparametros()
