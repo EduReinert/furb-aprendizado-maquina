@@ -31,12 +31,13 @@ def algoritmo_arvore_decisao_menor():
     Coloque como nome da variável: arvore_risco_credito
     """
         
-    arvore_risco_credito = DecisionTreeClassifier()
+    arvore_risco_credito = DecisionTreeClassifier(criterion='entropy')
     arvore_risco_credito = arvore_risco_credito.fit(X_risco_credito, y_risco_credito)
 
     #c) Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?
-    # R: História e Renda
+    # R: Renda
     print("Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?")
+    print("historia,divida,garantias,renda")
     print(arvore_risco_credito.feature_importances_)
 
     """
@@ -113,7 +114,7 @@ def algoritmo_arvore_decisao_maior():
     
     """
     #e) Análise da matriz de confusão
-    
+    0 (pagam) ;; 1 (não pagam)
     i. Quantos clientes foram classificados corretamente que pagam a dívida?
         R: 430
 
@@ -274,8 +275,8 @@ def algoritmo_random_forest():
     """
 
 def main():
-    #algoritmo_arvore_decisao_menor()
-    #algoritmo_arvore_decisao_maior()
+    algoritmo_arvore_decisao_menor()
+    algoritmo_arvore_decisao_maior()
     algoritmo_random_forest()
 
 if __name__ == "__main__":
