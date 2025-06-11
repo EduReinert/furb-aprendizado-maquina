@@ -35,6 +35,7 @@ def algoritmo_arvore_decisao_menor():
     arvore_risco_credito = arvore_risco_credito.fit(X_risco_credito, y_risco_credito)
 
     #c) Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?
+    # R: História e Renda
     print("Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?")
     print(arvore_risco_credito.feature_importances_)
 
@@ -114,12 +115,16 @@ def algoritmo_arvore_decisao_maior():
     #e) Análise da matriz de confusão
     
     i. Quantos clientes foram classificados corretamente que pagam a dívida?
+        R: 430
 
     ii. Quantos clientes foram classificados incorretamente como não pagantes?
+        R: 6
 
     iii. Quantos clientes foram classificados corretamente que não pagam?
+        R: 60
 
     iv. Quantos clientes foram classificados incorretamente como pagantes?
+        R: 4
     """
     cm = ConfusionMatrix(arvore_credit)
     cm.fit(X_credit_treinamento, y_credit_treinamento)
@@ -131,6 +136,15 @@ def algoritmo_arvore_decisao_maior():
     print("\nClassification Report:")
     report = classification_report(y_credit_teste, previsoes)
     print(report)
+    
+    """
+    RESPOSTA F)
+    Classe 0 (Pagadores): Excelente desempenho (precision=0.99, recall=0.99).
+    Classe 1 (Não pagadores): Bom desempenho, mas com precision (0.91) ligeiramente menor que recall (0.94), indicando mais falsos positivos.
+    Geral: Modelo muito preciso (accuracy=0.98), mas com leve viés para a classe majoritária (pagadores).
+    Relação precision-recall: Equilibrada para pagadores; para não pagadores, o modelo prioriza recall (capturar mais verdadeiros positivos) em detrimento da precision (mais falsos alarmes).
+    Interpretação: Ótimo para identificar pagadores, mas pode melhorar na precisão para não pagadores.
+    """
     
     
     """ g) Gere uma visualização da sua árvore de decisão utilizando o pacote tree da biblioteca do sklearn.
@@ -260,9 +274,9 @@ def algoritmo_random_forest():
     """
 
 def main():
-    algoritmo_arvore_decisao_menor()
+    #algoritmo_arvore_decisao_menor()
     #algoritmo_arvore_decisao_maior()
-    #algoritmo_random_forest()
+    algoritmo_random_forest()
 
 if __name__ == "__main__":
     main()
