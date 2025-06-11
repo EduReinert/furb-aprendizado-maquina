@@ -35,6 +35,7 @@ def algoritmo_arvore_decisao_menor():
     arvore_risco_credito = arvore_risco_credito.fit(X_risco_credito, y_risco_credito)
 
     #c) Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?
+    print("Utilize o feature_importances_ para retornar a importância de cada atributo. Qual possui o maior ganho de informação?")
     print(arvore_risco_credito.feature_importances_)
 
     """
@@ -43,11 +44,21 @@ def algoritmo_arvore_decisao_menor():
     """
     plt.figure(figsize=(10, 6))
     plot_tree(arvore_risco_credito, 
-              feature_names=X_risco_credito,  # Se X_risco_credito for um DataFrame
+              feature_names=['historia','divida','garantias','renda'],
               class_names=arvore_risco_credito.classes_,  # Nomes das classes
               filled=True,  # Preenchimento com cores
               rounded=True)  # Bordas arredondadas
     plt.show()
+    """
+    INFOS PRESENTES NA ÁRVORE
+    GINI -> O Gini (ou "impureza de Gini") mede a impureza de um nó, ou seja, o grau de mistura das classes naquele nó.
+    Se Gini = 0, o nó é puro (todas as amostras pertencem à mesma classe).
+    Se Gini > 0, há mistura de classes no nó.
+    
+    VALUE -> Mostra a distribuição das classes no nó. É uma lista que indica quantas amostras de cada classe estão presentes.
+    
+    CLASS -> Indica a classe predominante no nó (a classe com mais amostras em value).
+    """
     
     
     #e) FAZER A PREVISÃO || Utilize .predict para fazer a previsão realizada no exemplo em sala.
@@ -140,9 +151,20 @@ def algoritmo_arvore_decisao_maior():
               rounded=True,         # Bordas arredondadas
               proportion=True,      # Mostra proporções nas classes
               impurity=False,       # Não mostra impureza
-              fontsize=10,          # Tamanho da fonte
-              max_depth=3)          # Limitando a profundidade para melhor visualização
+              fontsize=10)          # Tamanho da fonte         
     
+    """
+    INFOS PRESENTES NA ÁRVORE
+    GINI -> O Gini (ou "impureza de Gini") mede a impureza de um nó, ou seja, o grau de mistura das classes naquele nó.
+    Se Gini = 0, o nó é puro (todas as amostras pertencem à mesma classe).
+    Se Gini > 0, há mistura de classes no nó.
+    
+    VALUE -> Mostra a distribuição das classes no nó. É uma lista que indica quantas amostras de cada classe estão presentes.
+    
+    CLASS -> Indica a classe predominante no nó (a classe com mais amostras em value).
+    """
+    
+    plt.savefig("arvore_decisao_credit_data.png", dpi=300, bbox_inches='tight')
     plt.title("Árvore de Decisão - Credit Data", fontsize=20)
     plt.show()
 
@@ -239,8 +261,8 @@ def algoritmo_random_forest():
 
 def main():
     algoritmo_arvore_decisao_menor()
-    algoritmo_arvore_decisao_maior()
-    algoritmo_random_forest()
+    #algoritmo_arvore_decisao_maior()
+    #algoritmo_random_forest()
 
 if __name__ == "__main__":
     main()
