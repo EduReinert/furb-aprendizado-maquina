@@ -285,35 +285,60 @@ def tuning_dos_hiperparametros():
     # 15) Descreva como a RNA foi configurada para fazer o processo de tuning.
     parametros = {
         'batch_size': [10, 30],
-        'epochs': [50, 100],
-        'model__optimizer': ['adam', 'sgd'],
-        'model__loss': ['binary_crossentropy', 'hinge'],
+        'epochs': [50],
+        'model__optimizer': ['adam'],
+        'model__loss': ['binary_crossentropy'],
         'model__kernel_initializer': ['random_uniform', 'normal'],
-        'model__activation': ['relu', 'tanh'],
-        'model__neurons': [16, 8]
+        'model__activation': ['relu'],
+        'model__neurons': [16]
     }
 
-    grid_search = GridSearchCV(estimator = rede_neural, param_grid = parametros, scoring = 'accuracy', cv = 5)
+    grid_normal = GridSearchCV(estimator = rede_neural, param_grid = parametros, scoring = 'accuracy', cv = 5)
 
-    X = dados.values
+    X_raw = dados.values
     y = rotulos.values.ravel()
-    grid_search = grid_search.fit(X, y)
-    melhores_parametros = grid_search.best_params_
-    melhor_precisao = grid_search.best_score_
+    grid_normal.fit(X_raw, y)
 
-    print(grid_search)
-    print(melhores_parametros)
-    print(melhor_precisao)
-
-    # 16) É possível melhorar ainda mais a acurácia da RNA? Como?
-    # Sim, fazendo a Z-score normalization, pra evitar que features com escalas maiores dominem as outras.
+    # 2. Grid search com os dados normalizados (Z-score)
     scaler = StandardScaler()
-    X_treinamento = scaler.fit_transform(X_treinamento)
-    X_teste = scaler.transform(X_teste)
+    X_scaled = scaler.fit_transform(X_raw)
+
+    grid_normalizada = GridSearchCV(estimator=rede_neural, param_grid=parametros, scoring='accuracy', cv=5)
+    grid_normalizada.fit(X_scaled, y)
+
+    # Resultados
+    print("\nSem normalização:")
+    print("  Melhor acurácia:", grid_normal.best_score_)
+    print("  Parâmetros:", grid_normal.best_params_)
+
+    print("\nCom normalização (Z-score):")
+    print("  Melhor acurácia:", grid_normalizada.best_score_)
+    print("  Parâmetros:", grid_normalizada.best_params_)
+
+    grid_normal.best_estimator_.model_.save("modelo_treiando_sem_normalizacao.keras")
+    grid_normal.best_estimator_.model_.save("modelo_treiando_com_normalizacao.keras")
+
+def carrega_e_mostra_modelos_salvos():
+    print("\n--- Carregando Modelos Salvos---\n")
+    
+    try:
+        modelo_sem_normalizacao = tf.keras.models.load_model("modelo_treiando_sem_normalizacao.keras")
+        modelo_sem_normalizacao.summary()
+    except Exception as e:
+        print(f"Erro ao carregar modelo_treiando_sem_normalizacao.keras: {e}")
+    
+    print("\n" + "-"*60 + "\n")
+    
+    try:
+        modelo_com_normalizacao = tf.keras.models.load_model("modelo_treiando_com_normalizacao.keras")
+        modelo_com_normalizacao.summary()
+    except Exception as e:
+        print(f"Erro ao carregar modelo_treiando_com_normalizacao.keras: {e}")
 
 
 # estrutura_da_rede_neural_artificial_e_teste()
 # camadas_e_otimizacao_da_rna()
 # k_fold_cross_validation()
 # overfitting_e_dropout()
-tuning_dos_hiperparametros()
+# tuning_dos_hiperparametros()
+carrega_e_mostra_modelos_salvos()
